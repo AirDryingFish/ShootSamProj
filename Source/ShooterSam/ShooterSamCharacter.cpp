@@ -12,6 +12,22 @@
 #include "InputActionValue.h"
 #include "ShooterSam.h"
 
+void AShooterSamCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	GetMesh()->HideBoneByName("weapon_r", PBO_None);
+	
+	Gun = GetWorld()->SpawnActor<AGun>(GunClass);
+	if (Gun)
+	{
+		Gun->SetOwner(this);
+		Gun->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("WeaponSocket"));
+		Gun->OwnerController = GetController();
+	}
+	
+}
+
 AShooterSamCharacter::AShooterSamCharacter()
 {
 	// Set size for collision capsule
@@ -65,6 +81,8 @@ void AShooterSamCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AShooterSamCharacter::Look);
+
+		EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Started, this, &AShooterSamCharacter::Shoot);
 	}
 	else
 	{
@@ -77,7 +95,7 @@ void AShooterSamCharacter::Move(const FInputActionValue& Value)
 	// input is a Vector2D
 	FVector2D MovementVector = Value.Get<FVector2D>();
 	
-	UE_LOG(LogTemp, Display, TEXT("[Character Log] input x = %f, y = %f"), MovementVector.X, MovementVector.Y);
+	// UE_LOG(LogTemp, Display, TEXT("[Character Log] input x = %f, y = %f"), MovementVector.X, MovementVector.Y);
 
 	// route the input
 	DoMove(MovementVector.X, MovementVector.Y);
@@ -132,4 +150,10 @@ void AShooterSamCharacter::DoJumpEnd()
 {
 	// signal the character to stop jumping
 	StopJumping();
+}
+
+void AShooterSamCharacter::Shoot()
+{
+	UE_LOG(LogTemp, Display, TEXT("SHOOOOOT!"));
+	Gun->PullTrigger();
 }

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Gun.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
 #include "ShooterSamCharacter.generated.h"
@@ -32,6 +33,7 @@ class AShooterSamCharacter : public ACharacter
 	UCameraComponent* FollowCamera;
 	
 protected:
+	virtual void BeginPlay() override;
 
 	/** Jump Input Action */
 	UPROPERTY(EditAnywhere, Category="Input")
@@ -48,6 +50,15 @@ protected:
 	/** Mouse Look Input Action */
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* MouseLookAction;
+
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* ShootAction;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AGun> GunClass;
+
+	UPROPERTY(VisibleAnywhere)
+	AGun* Gun;
 
 public:
 
@@ -84,6 +95,8 @@ public:
 	/** Handles jump pressed inputs from either controls or UI interfaces */
 	UFUNCTION(BlueprintCallable, Category="Input")
 	virtual void DoJumpEnd();
+
+	virtual void Shoot();
 
 public:
 
