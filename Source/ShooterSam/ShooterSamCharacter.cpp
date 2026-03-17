@@ -11,6 +11,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "ShooterSam.h"
+#include "ShooterSamPlayerController.h"
 
 void AShooterSamCharacter::BeginPlay()
 {
@@ -26,6 +27,21 @@ void AShooterSamCharacter::BeginPlay()
 		Gun->OwnerController = GetController();
 	}
 	
+	OnTakeAnyDamage.AddDynamic(this, &AShooterSamCharacter::OnTakeDamage);
+	
+	Health = MaxHealth;
+	
+	UpdateHUD();
+	
+}
+
+void AShooterSamCharacter::UpdateHUD()
+{
+	AShooterSamPlayerController* PlayerController = Cast<AShooterSamPlayerController>(GetController());
+	if (PlayerController)
+	{
+		PlayerController->HUDWidget->SetHPBarPercent(Health / MaxHealth);
+	}
 }
 
 AShooterSamCharacter::AShooterSamCharacter()
@@ -154,6 +170,31 @@ void AShooterSamCharacter::DoJumpEnd()
 
 void AShooterSamCharacter::Shoot()
 {
-	UE_LOG(LogTemp, Display, TEXT("SHOOOOOT!"));
+	// UE_LOG(LogTemp, Display, TEXT("SHOOOOOT!"));
 	Gun->PullTrigger();
+}
+
+void AShooterSamCharacter::OnTakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType,
+	class AController* InstigatedBy, AActor* DamageCauser)
+{
+	UE_LOG(LogTemp, Display, TEXT("Damage taken: %f"), Damage);
+	if (IsAlive)
+	{
+		Health -= Damage;
+		UpdateHUD();
+		if (Health <= 0)
+		{
+			IsAlive = false;
+			Health = 0;
+			
+			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			DetachFromControllerPendingDestroy();
+			UE_LOG(LogTemp, Display, TEXT("Character died: %s"), *GetActorNameOrLabel());
+		}
+	}
+	else
+	{
+		IsAlive = false;
+		Health = 0;
+	}
 }

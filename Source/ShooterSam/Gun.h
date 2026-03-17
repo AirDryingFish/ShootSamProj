@@ -4,6 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
+
+
 #include "Gun.generated.h"
 
 UCLASS()
@@ -28,8 +33,27 @@ public:
 
 	UPROPERTY(VisibleAnywhere)
 	USkeletalMeshComponent* SkeletalMeshComponent;
+	
+	
+	UPROPERTY(VisibleAnywhere)
+	UNiagaraComponent* MuzzleFlashParticleSystem;
+	
+	UPROPERTY(EditAnywhere)
+	UNiagaraSystem* ImpactParticleSystem;
+	
+	UPROPERTY(EditAnywhere)
+	float BulletDamage;
 
 	AController* OwnerController;
+	
+	UPROPERTY(EditAnywhere)
+	USoundBase* ShootSound;
+	
+	UPROPERTY(EditAnywhere)
+	USoundBase* ImpactSound;
+	
+	
+	float MaxRange = 10000.0f;
 
 	void PullTrigger();
 };
